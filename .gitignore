@@ -9,7 +9,7 @@ logs/
 
 # Package Files #
 *.zip
-*.tar.gz
+
 *.rar
 
 *.git
