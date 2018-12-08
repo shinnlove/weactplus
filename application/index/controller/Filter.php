@@ -52,7 +52,7 @@ class Filter extends Controller {
     public function handle_request_param($request) {
         dump("===========handle_request_param=========");
         $request_params = $request->param();
-        $id = $request->param('id');
+        $id = $request->param('user_id');
         $name = $request->param('name');
 
         dump($request_params);
