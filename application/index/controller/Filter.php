@@ -5,13 +5,29 @@ namespace app\index\controller;
 use think\Controller;
 use think\Request;
 
+/**
+ * 请求头过滤解析器。
+ *
+ * Class Filter
+ * @package app\index\controller
+ */
 class Filter extends Controller {
 
+    /**
+     * sso解析请求头页面。
+     *
+     * 尝试访问下面网址试试看：
+     * http://localhost/weactplus/public/index/filter/sso?id=shinnlove&name=%E9%87%91%E5%8D%87&age=24&redirect_uri=http%3A%2F%2Fwww.we-act.cn%2Fweactplus%2Fproduct%2Fdetail%2F100
+     *
+     * @return mixed
+     */
     public function sso() {
 
         $request = Request::instance();
 
-        $this->basic_header($request);
+        $this->handle_request_param($request);
+
+        $this->basic_request_info($request);
 
         $header = $request->header();
         $this->handle_header($header);
@@ -26,6 +42,22 @@ class Filter extends Controller {
         $this->handler_server($server);
 
         return $this->fetch();
+    }
+
+    /**
+     * 处理request请求的入参。
+     *
+     * @param $request
+     */
+    public function handle_request_param($request) {
+        dump("===========handle_request_param=========");
+        $request_params = $request->param();
+        $id = $request->param('id');
+        $name = $request->param('name');
+
+        dump($request_params);
+        dump($id);
+        dump($name);
     }
 
     /**
@@ -108,7 +140,7 @@ class Filter extends Controller {
         $http_connection = $server['HTTP_CONNECTION'];
 
         // header cache-control
-        $http_cache_control = $server['HTTP_CACHE_CONTROL'];
+        $http_cache_control = isset($server['HTTP_CACHE_CONTROL']) ? $server['HTTP_CACHE_CONTROL'] : "";
 
         // header user-agent
         $http_user_agent = $server['HTTP_USER_AGENT'];
@@ -141,7 +173,8 @@ class Filter extends Controller {
      *
      * @param $request
      */
-    public function basic_header($request) {
+    public function basic_request_info($request) {
+        dump("===========basic_request_info=========");
         // 获取当前域名
         echo 'domain: ' . $request->domain() . '<br/>';
 
