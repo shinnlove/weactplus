@@ -17,7 +17,7 @@ class Filter extends Controller {
      * sso解析请求头页面。
      *
      * 尝试访问下面网址试试看：
-     * http://localhost/weactplus/public/index/filter/sso?id=shinnlove&name=%E9%87%91%E5%8D%87&age=24&redirect_uri=http%3A%2F%2Fwww.we-act.cn%2Fweactplus%2Fproduct%2Fdetail%2F100
+     * http://localhost/weactplus/public/index/filter/sso?user_id=123456&name=shinnlove&nickname=%E9%87%91%E5%8D%87&age=24&redirect_uri=http%3A%2F%2Fwww.we-act.cn%2Fweactplus%2Fproduct%2Fdetail%2F100
      *
      * @return mixed
      */
