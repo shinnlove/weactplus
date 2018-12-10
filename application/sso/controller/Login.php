@@ -53,7 +53,8 @@ class Login extends Controller {
         // 响应信息
         $response = array(
             'errCode' => 10001,
-            'errMsg' => "账号或密码错误"
+            'errMsg' => "账号或密码错误",
+            'data' => array()
         );
 
         // 请求用户登录
@@ -75,19 +76,12 @@ class Login extends Controller {
             $redis->connect('127.0.0.1', 6379);
             $redis->set($sso_key, $sso_value);
 
-            $src_url = "";
-            // TODO：正则校验$redirect_uri中有没有参数，有参数的话则用&拼接，否则就直接?拼接。这里先简单处理下。
-            if (strpos($redirect_uri, "?")) {
-                $src_url = $redirect_uri . "&sso_token=" . $sso_token;
-            } else {
-                $src_url = $redirect_uri . "?sso_token=" . $sso_token;
-            }
-
             // 登录成功
             $response['errCode'] = 0;
             $response['errMsg'] = "ok";
-            // 跳转原来系统
-            $response['redirect_uri'] = $src_url;
+            // 重要cookie和回跳地址
+            $response['data']['sso_token'] = $sso_token;
+            $response['data']['redirect_uri'] = $redirect_uri;
         }
 
         // 响应给前端

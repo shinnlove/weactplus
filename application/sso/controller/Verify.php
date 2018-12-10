@@ -11,10 +11,10 @@ use \Logger;
 /**
  * SSO Token有效时间验证。
  *
- * Class Varify
+ * Class Verify
  * @package app\sso\controller
  */
-class Varify extends Controller {
+class Verify extends Controller {
 
     /**
      * 验证sso的token是否有效接口。

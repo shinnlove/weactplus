@@ -70,13 +70,28 @@
             // 请求登录
             $.post("checkin", params, function (result) {
                 if (result.errCode == 0) {
-                    window.location.href = result.redirect_uri;
+                    // 登录ok写cookie
+                    addCookie("sso_token", result.data.sso_token, 30, "we-act.cn");
+                    // 再跳转
+                    window.location.href = result.data.redirect_uri;
                 } else {
                     alert("登录失败，" + result.errMsg);
                 }
             }, "json");
         });
-    })
+    });
+
+    function addCookie(cookieKey, cookieValue, cookieMinutes, domainName) {
+        var str = cookieKey + "=" + escape(cookieValue);
+        if(cookieMinutes > 0) {
+            //为0时不设定过期时间，浏览器关闭时cookie自动消失
+            var date = new Date();
+            var ms = cookieMinutes * 60 * 1000;
+            date.setTime(date.getTime() + ms);
+            str += "; expires=" + date.toGMTString()+"; path=/; domain=." + domainName;
+        }
+        document.cookie = str;
+    }
 </script>
 </body>
 </html>
