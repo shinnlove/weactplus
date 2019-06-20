@@ -12,14 +12,44 @@ use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Message\AMQPMessage;
 
 
-class Index extends Controller
-{
-    public function index()
-    {
+class Index extends Controller {
+
+    public function washes() {
+        // 将临时表的价格扩充入主表中
+
+        $product_sku = Db::table("product_sku")->limit(0, 10000)->select();
+        for ($i = 0; $i < count($product_sku); $i++) {
+            $product_id = $product_sku[$i]['product_id'];
+            $sku_price = $product_sku[$i]['sku_price'] * 6.9035; // 2019年6月20日美元兑人民币汇率
+
+            // 改价格
+
+//            $update_info = array(
+//                'original_price' => $sku_price,
+//                'current_price' => $sku_price
+//            );
+//            $result = Db::name("t_product")->where("product_id", $product_id)->update($update_info);
+
+
+            // 改库存
+
+            $storage_info = array(
+                'central_total_storage' => 100,
+                'storage_amount' => 100
+            );
+
+            $storage_update = Db::name("t_productsizecolor")->where("product_id", $product_id)->update($storage_info);
+
+        }
+
+        p("运行完成");die;
+    }
+
+    public function index() {
         return '<style type="text/css">*{ padding: 0; margin: 0; } .think_default_text{ padding: 4px 48px;} a{color:#2E5CD5;cursor: pointer;text-decoration: none} a:hover{text-decoration:underline; } body{ background: #fff; font-family: "Century Gothic","Microsoft yahei"; color: #333;font-size:18px} h1{ font-size: 100px; font-weight: normal; margin-bottom: 12px; } p{ line-height: 1.6em; font-size: 42px }</style><div style="padding: 24px 48px;"> <h1>:)</h1><p> ThinkPHP V5<br/><span style="font-size:30px">十年磨一剑 - 为API开发设计的高性能框架</span></p><span style="font-size:22px;">[ V5.0 版本由 <a href="http://www.qiniu.com" target="qiniu">七牛云</a> 独家赞助发布 ]</span></div><script type="text/javascript" src="https://tajs.qq.com/stats?sId=9347272" charset="UTF-8"></script><script type="text/javascript" src="https://e.topthink.com/Public/static/client.js"></script><think id="ad_bd568ce7058a1091"></think>';
     }
 
-    public function hello($name = 'thinkphp'){
+    public function hello($name = 'thinkphp') {
         $this->test2Logs();
 
 //        $this->sendMsgToRabbit();
@@ -28,7 +58,7 @@ class Index extends Controller
         return $this->fetch();
     }
 
-    public function receive(){
+    public function receive() {
         // 两个句柄
         $connection = null;
         $channel = null;
@@ -59,8 +89,8 @@ class Index extends Controller
             while (count($channel->callbacks)) {
                 $channel->wait();
                 // 让消息出现
-                $i ++;
-                if($i > 0) break;
+                $i++;
+                if ($i > 0) break;
             }
 
         } catch (Exception $e) {
@@ -79,7 +109,7 @@ class Index extends Controller
     /**
      * 发送消息到RabbitMQ
      */
-    function sendMsgToRabbit(){
+    function sendMsgToRabbit() {
         // 两个句柄
         $connection = null;
         $channel = null;
@@ -93,10 +123,10 @@ class Index extends Controller
             $msg = new AMQPMessage('Hello World!');
             $channel->basic_publish($msg, '', 'hello');
         } catch (Exception $e) {
-            dump("投递消息发生错误". $e);
+            dump("投递消息发生错误" . $e);
         }
 
-        if ($connection != null && $channel != null){
+        if ($connection != null && $channel != null) {
             $channel->close();
             $connection->close();
         }
@@ -104,8 +134,7 @@ class Index extends Controller
         dump("[x] Sent 'Hello World!'");
     }
 
-    public function read()
-    {
+    public function read() {
         # 被误用的优惠券
         $coupon_missed = "select 
                                 supplier_id, new_value 
@@ -209,8 +238,7 @@ class Index extends Controller
         return $this->fetch();
     }
 
-    public function analysis()
-    {
+    public function analysis() {
         vendor("PHPExcel.Classes.PHPExcel");
 
         $root_path = $_SERVER['DOCUMENT_ROOT'];
@@ -310,8 +338,7 @@ class Index extends Controller
 
     }
 
-    function downloadExcelExtend($data = array())
-    {
+    function downloadExcelExtend($data = array()) {
         vendor("PHPExcel.Classes.PHPExcel");
         $objPHPExcel = new \PHPExcel(); // 创建一个excel
         $excelFileName = "短信通知";
@@ -357,8 +384,7 @@ class Index extends Controller
     /**
      * 将数据库数据导出为excel文件
      */
-    function downLoadExcel($data)
-    {
+    function downLoadExcel($data) {
 //        $user = Db::query("select * from user");
 //        Loader::import('PHPExcel.PHPExcel');
 //        Loader::import('PHPExcel.PHPExcel.IOFactory.PHPExcel_IOFactory');
@@ -427,8 +453,7 @@ class Index extends Controller
      *
      * 特殊处理：合并单元格需要先对数据进行处理
      */
-    function exportOrderExcel($title, $cellName, $data)
-    {
+    function exportOrderExcel($title, $cellName, $data) {
         //引入核心文件
         vendor("PHPExcel.PHPExcel");
         $objPHPExcel = new \PHPExcel();
@@ -505,14 +530,14 @@ class Index extends Controller
     /**
      * 测试thinkphp中两种不同的日志。
      */
-    function test2Logs(){
+    function test2Logs() {
         // thinkphp 原生的日志系统
         Log::record('测试日志信息');
         Log::error('错误信息');
         Log::info('日志信息');
 
         // thinkphp使用log4php
-        Logger::configure(APP_PATH.'config.xml');
+        Logger::configure(APP_PATH . 'config.xml');
         $logger = Logger::getLogger("silk");
         $logger->info("This is an informational message.");
         $logger->warn("I'm not feeling so good...");
